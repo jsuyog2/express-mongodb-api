@@ -1,0 +1,31 @@
+{
+    "name": "express-postgresql-api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jsuyog2/express-postgresql-api"
+    },
+    "keywords": [
+        "api"
+    ],
+    "author": "Suyog Jadhav",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/jsuyog2/express-postgresql-api/issues"
+    },
+    "homepage": "https://github.com/jsuyog2/express-postgresql-api#readme",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "mongodb": "^4.1.2",
+        "nodemailer": "^6.4.17",
+        "pbkdf2-password": "^1.2.1",
+        "request-ip": "^2.1.3"
+    }
+}
