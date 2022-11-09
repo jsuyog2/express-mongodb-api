@@ -5,7 +5,6 @@ const path = require('path');
 var ObjectID = require('mongodb').ObjectID;
 const requestIp = require('request-ip');
 const errors = require('../config/errors.json');
-const config = require('../config');
 
 module.exports = {
     validateEmail: function (data) {
@@ -125,7 +124,7 @@ module.exports = {
                 })
             } else {
                 var cert = fs.readFileSync('key/public.key'); // get public key
-                var token = data.access_token.replace("tt", config.jwt_temp_algo);
+                var token = data.access_token.replace("tt", process.env.jwt_temp_algo);
                 jwt.verify(token, cert, function (err, decoded) {
                     if (err) {
                         reject({
@@ -149,7 +148,7 @@ module.exports = {
                     "message": errors.access_token_not_found_message
                 })
             } else {
-                var token = data.access_token.replace("tt", config.jwt_temp_algo);
+                var token = data.access_token.replace("tt", process.env.jwt_temp_algo);
                 var decoded = jwt.decode(token);
                 resolve(decoded);
             }
@@ -165,7 +164,7 @@ module.exports = {
                 })
             } else {
                 const secret = requestIp.getClientIp(req);
-                var token = data.access_token.replace("lt", config.jwt_algo);
+                var token = data.access_token.replace("lt", process.env.jwt_algo);
                 jwt.verify(token, secret, function (err, decoded) {
                     if (err) {
                         reject({
@@ -192,7 +191,7 @@ module.exports = {
     makeValidTempAccessToken: function (data) {
         var privateKey = fs.readFileSync(`key/private.key`);
         var token = jwt.sign(data, privateKey, {
-            algorithm: config.jwt_temp_algo_name,
+            algorithm: process.env.jwt_temp_algo_name,
             expiresIn: '1h'
         });
         var header = token.substr(0, token.indexOf("."));
@@ -239,17 +238,18 @@ module.exports = {
     },
     sendMail: function (to, subject, message, path, token) {
         return new Promise(function (resolve, reject) {
+            var mail = JSON.parse(process.env.mail)
             var transporter = nodemailer.createTransport({
-                host: config.mail.host,
-                port: config.mail.port,
+                host: mail.host,
+                port: mail.port,
                 secure: true,
                 auth: {
-                    user: config.mail.username,
-                    pass: config.mail.password
+                    user: mail.username,
+                    pass: mail.password
                 }
             });
 
-            var url = config.baseUrl + path + "?access_token=" + token;
+            var url = process.env.baseUrl + path + "?access_token=" + token;
 
             var mailOptions = {
                 from: "no-reply@mapdatalab.com",
