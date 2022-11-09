@@ -3,6 +3,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 var cors = require("cors");
 const { MongoClient } = require("mongodb");
+const helmet = require('helmet');
+const morgan = require('morgan');
+
 const app = express();
 
 // create application/json parser
@@ -54,6 +57,11 @@ const corsOptionsDelegate = (req, callback) => {
   callback(null, corsOptions);
 };
 app.use(cors(corsOptionsDelegate));
+
+app.use(helmet());
+
+app.use(morgan('combined'));
+
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Example app listening on port ${process.env.PORT}!`);
 });
