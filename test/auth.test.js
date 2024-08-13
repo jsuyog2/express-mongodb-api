@@ -22,6 +22,7 @@
 
 require('dotenv').config();
 const fs = require('fs');
+const path = require('path');
 const httpMocks = require('node-mocks-http');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -33,7 +34,7 @@ const authController = require('./../controllers/auth.controller');
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 jest.mock('../utils/emailService');
-
+jest.mock('mongoose', () => require('mongoose-mock'));
 /**
   * @description Unit tests for the login function of the auth controller.
   */
@@ -41,6 +42,7 @@ describe('Auth Controller', () => {
 
     let req, res;
     const orignalFs = fs.readFileSync
+    const orignalPath = path.resolve
     beforeEach(() => {
         const mockPublicKey = 'mockPublicKeyContent';
         fs.readFileSync = jest.fn().mockResolvedValue(mockPublicKey)
@@ -50,7 +52,7 @@ describe('Auth Controller', () => {
 
     afterEach(async () => {
         fs.readFileSync = orignalFs;
-        await db.mongoose.connection.close();
+        path.resolve = orignalPath;
         jest.clearAllMocks();
     });
 
@@ -65,7 +67,7 @@ describe('Auth Controller', () => {
             db.user.findOne = jest.fn().mockResolvedValue(mockUser);
             db.session.create = jest.fn();
             jwt.sign.mockReturnValue('mocktoken');
-
+            path.resolve = jest.fn().mockResolvedValue('/./');
             await authController.login(req, res);
 
             expect(res.statusCode).toBe(200);

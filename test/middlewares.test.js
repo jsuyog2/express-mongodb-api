@@ -19,6 +19,7 @@
 
 require('dotenv').config();
 const fs = require('fs');
+const path = require('path');
 const httpMocks = require('node-mocks-http');
 const { validationResult } = require('express-validator');
 const { verifyToken, logger, roleAuthorization, validationErrorHandler } = require('../middlewares'); // Adjust the path as needed
@@ -26,7 +27,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../models');
 
 jest.mock('express-validator');
-
+jest.mock('mongoose', () => require('mongoose-mock'));
 /**
  * @description Unit tests for the verifyToken middleware function.
  *              This middleware verifies JWT tokens, checks for token validity, blacklist status, and associated user information.
@@ -34,6 +35,7 @@ jest.mock('express-validator');
 describe('verifyToken Middleware', () => {
     let req, res, next;
     const orignalFs = fs.readFileSync
+    const orignalPath = path.resolve
     beforeEach(() => {
         const mockPublicKey = 'mockPublicKeyContent';
         fs.readFileSync = jest.fn().mockResolvedValue(mockPublicKey)
@@ -43,7 +45,7 @@ describe('verifyToken Middleware', () => {
     });
 
     afterEach(async () => {
-        await db.mongoose.connection.close();
+        path.resolve = orignalPath;
         fs.readFileSync = orignalFs;
     })
 
@@ -73,7 +75,7 @@ describe('verifyToken Middleware', () => {
         jwt.verify = jest.fn((token, publicKey, options, callback) => {
             callback(new Error('Invalid token'), null);
         });
-
+        jest.spyOn(path, 'resolve').mockReturnValueOnce('/fakepath');
         verifyToken(req, res, next);
 
         setTimeout(() => {
@@ -94,7 +96,7 @@ describe('verifyToken Middleware', () => {
         jwt.verify = jest.fn((token, publicKey, options, callback) => {
             callback(null, {});
         });
-
+        jest.spyOn(path, 'resolve').mockReturnValueOnce('/fakepath');
         verifyToken(req, res, next);
 
         setTimeout(() => {
@@ -117,7 +119,7 @@ describe('verifyToken Middleware', () => {
         });
 
         db.session.findOne = jest.fn().mockResolvedValue({ flag: true });
-
+        jest.spyOn(path, 'resolve').mockReturnValueOnce('/fakepath');
         verifyToken(req, res, next);
 
         setTimeout(() => {
@@ -142,7 +144,7 @@ describe('verifyToken Middleware', () => {
         db.session.findOne = jest.fn().mockResolvedValue({ flag: false });
 
         db.user.findOne = jest.fn().mockResolvedValue(null); // User not found
-
+        jest.spyOn(path, 'resolve').mockReturnValueOnce('/fakepath');
         verifyToken(req, res, next);
 
         setTimeout(() => {
@@ -153,9 +155,9 @@ describe('verifyToken Middleware', () => {
     });
 
     /**
-     * @description Test case for successful token verification.
-     *              The middleware should attach user information to req and call next().
-     */
+    * @description Test case for successful token verification.
+    *              The middleware should attach user information to req and call next().
+    */
     it('should attach user info to req and call next() if the token is valid and user is found', (done) => {
         const mockToken = 'validtoken';
         req.headers.authorization = `Bearer ${mockToken}`;
@@ -175,6 +177,7 @@ describe('verifyToken Middleware', () => {
         db.user_roles.find = jest.fn().mockReturnValue({
             populate: jest.fn().mockResolvedValue(userRoles)
         });
+        jest.spyOn(path, 'resolve').mockReturnValueOnce('/fakepath');
         verifyToken(req, res, next);
 
         setTimeout(() => {
@@ -203,7 +206,7 @@ describe('verifyToken Middleware', () => {
             callback(null, { id: 1, username: 'testuser' });
         });
         db.session.findOne.mockRejectedValue(mockError);
-
+        jest.spyOn(path, 'resolve').mockReturnValueOnce('/fakepath');
         verifyToken(req, res, next);
         setTimeout(() => {
             expect(res.statusCode).toBe(401);
@@ -230,9 +233,6 @@ describe('logger Middleware', () => {
         res = httpMocks.createResponse();
         next = jest.fn();
     });
-    afterEach(async () => {
-        await db.mongoose.connection.close();
-    })
     /**
      * @description Test case for logging request details to the database.
      */
@@ -323,9 +323,6 @@ describe('roleAuthorization Middleware', () => {
         res = httpMocks.createResponse();
         next = jest.fn();
     });
-    afterEach(async () => {
-        await db.mongoose.connection.close();
-    })
 
     /**
      * @description Test case for allowing access when the user has the required role.
@@ -378,9 +375,6 @@ describe('validationErrorHandler Middleware', () => {
         res = httpMocks.createResponse();
         next = jest.fn();
     });
-    afterEach(async () => {
-        await db.mongoose.connection.close();
-    })
     /**
      * @description Test case for handling validation errors.
      *              The middleware should return a 400 status with the error details.

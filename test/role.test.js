@@ -24,13 +24,14 @@ const roleController = require('../controllers/role.controller');
 const db = require('../models');
 const httpMocks = require('node-mocks-http');
 
+jest.mock('mongoose', () => require('mongoose-mock'));
+
 describe('Role Controller', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     afterEach(async () => {
-        await db.mongoose.connection.close();
         jest.clearAllMocks();
     });
 
