@@ -28,7 +28,8 @@ const userController = require('../controllers/user.controller');
 const db = require('../models');
 const bcrypt = require('bcrypt');
 const httpMocks = require('node-mocks-http');
-jest.mock('mongoose', () => require('mongoose-mock'));
+jest.mock('mongoose');
+jest.mock('../models', () => require('./__mocks__/mongoose'));
 describe('User Controller', () => {
     let userMock;
 

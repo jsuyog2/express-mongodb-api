@@ -27,7 +27,8 @@ const jwt = require('jsonwebtoken');
 const db = require('../models');
 
 jest.mock('express-validator');
-jest.mock('mongoose', () => require('mongoose-mock'));
+jest.mock('mongoose');
+jest.mock('../models', () => require('./__mocks__/mongoose'));
 /**
  * @description Unit tests for the verifyToken middleware function.
  *              This middleware verifies JWT tokens, checks for token validity, blacklist status, and associated user information.

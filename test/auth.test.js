@@ -34,7 +34,8 @@ const authController = require('./../controllers/auth.controller');
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 jest.mock('../utils/emailService');
-jest.mock('mongoose', () => require('mongoose-mock'));
+jest.mock('mongoose');
+jest.mock('../models', () => require('./__mocks__/mongoose'));
 /**
   * @description Unit tests for the login function of the auth controller.
   */
