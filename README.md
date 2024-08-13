@@ -177,7 +177,7 @@ Now you need to create Private and Public Key to generate a Token.
 
 ## API Endpoints
 
-This section provides an overview of the available API endpoints for the application. For detailed request and response formats, refer to the [Postman Documentation](https://documenter.getpostman.com/view/30249900/2sA3s3Jrw9).
+This section provides an overview of the available API endpoints for the application. For detailed request and response formats, refer to the [Postman Documentation](https://documenter.getpostman.com/view/30249900/2sA3s4nr4h).
 
 ### Authentication
 
@@ -245,7 +245,7 @@ This section provides an overview of the available API endpoints for the applica
 
 ---
 
-For further details and examples, please refer to the [Postman Collection](https://documenter.getpostman.com/view/30249900/2sA3s3Jrw9).
+For further details and examples, please refer to the [Postman Collection](https://documenter.getpostman.com/view/30249900/2sA3s4nr4h).
 
 ## Testing
 
